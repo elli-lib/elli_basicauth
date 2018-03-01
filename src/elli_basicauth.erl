@@ -2,6 +2,7 @@
 %%
 %% This middleware provides basic authentication to protect
 %% Reqs based on a user-configured authentication function
+%% @author Martin Rehfeld
 
 -module(elli_basicauth).
 

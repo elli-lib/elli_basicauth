@@ -9,6 +9,8 @@ Elli basicauth middleware.
 
 __Behaviours:__ [`elli_handler`](https://github.com/elli-lib/elli/blob/develop/doc/elli_handler.md).
 
+__Authors:__ Martin Rehfeld.
+
 <a name="description"></a>
 
 ## Description ##
