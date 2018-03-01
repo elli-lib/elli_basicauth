@@ -1,10 +1,12 @@
-%% @doc Elli basicauth overview
+%% @doc Elli basicauth middleware
 %%
 %% This middleware provides basic authentication to protect
 %% Reqs based on a user-configured authentication function
 
 -module(elli_basicauth).
+
 -behaviour(elli_handler).
+
 -export([handle/2, handle_event/3]).
 
 
