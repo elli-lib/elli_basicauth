@@ -10,6 +10,35 @@
 
 -export([handle/2, handle_event/3]).
 
+-export_type([auth_fun/0, auth_status/0, config/0]).
+
+
+%% @type auth_fun(). A user-configurable authentication function.
+-type auth_fun() :: fun((Req      :: elli:req(),
+                         Username :: binary(),
+                         Password :: binary()) ->
+                               AuthStatus :: auth_status()).
+
+
+%% @type auth_status(). The result of an {@type auth_fun()}.
+-type auth_status() :: ok |
+                       unauthorized |
+                       forbidden |
+                       hidden.
+
+
+%% @type config(). A property list of options.
+%% The configurable options are:
+%% <dl>
+%%   <dt>`auth_fun'</dt>
+%%   <dd>An {@type auth_fun()}</dd>
+%%   <dt>`auth_realm'</dt>
+%%   <dd>A binary <a href="https://tools.ietf.org/html/rfc1945#section-11">realm</a>.</dd>
+%% </dl>
+-type config() :: [{auth_fun, auth_fun()} |
+                   {auth_realm, binary()} |
+                   term()].
+
 
 handle(Req, Config) ->
     {User, Password} = credentials(Req),
@@ -38,6 +67,11 @@ handle_event(_, _, _) ->
 %%
 %% INTERNAL HELPERS
 %%
+
+-type credentials() :: {undefined, undefined} |
+                       {Username :: binary(),
+                        Password :: binary()}.
+
 
 auth_fun(Config) ->
     proplists:get_value(auth_fun, Config,
