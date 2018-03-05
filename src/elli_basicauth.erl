@@ -90,34 +90,41 @@ default_auth_fun(_Req, _User, _Password) ->
                         Password :: binary()}.
 
 
+-spec auth_fun(config()) -> auth_fun().
 auth_fun(Config) ->
     proplists:get_value(auth_fun, Config, fun default_auth_fun/3).
 
 
+-spec auth_realm(config()) -> binary().
 auth_realm(Config) ->
     Realm = proplists:get_value(auth_realm, Config, <<"Secure Area">>),
     iolist_to_binary([<<"Basic realm=\"">>, Realm, <<"\"">>]).
 
 
+-spec credentials(elli:req()) -> credentials().
 credentials(Req) ->
     credentials_from_header(authorization_header(Req)).
 
 
+-spec authorization_header(elli:req()) -> undefined | binary().
 authorization_header(Req) ->
     elli_request:get_header(<<"Authorization">>, Req).
 
 
+-spec credentials_from_header(undefined | binary()) -> credentials().
 credentials_from_header(<<"Basic ", EncodedCredentials/binary>>) ->
     decoded_credentials(EncodedCredentials);
 credentials_from_header(_Authorization) ->
     ?DEFAULT_CREDENTIALS.
 
 
+-spec decoded_credentials(binary()) -> credentials().
 decoded_credentials(EncodedCredentials) ->
     DecodedCredentials = base64:decode(EncodedCredentials),
     do_decoded_credentials(binary:split(DecodedCredentials, <<$:>>)).
 
 
+-spec do_decoded_credentials([binary()]) -> credentials().
 do_decoded_credentials([User, Password]) ->
     {User, Password};
 do_decoded_credentials(_Bins) ->
