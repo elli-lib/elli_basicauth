@@ -9,7 +9,7 @@
 
 -behaviour(elli_handler).
 
--export([handle/2, handle_event/3]).
+-export([handle/2, handle_event/3, default_auth_fun/3]).
 
 -export_type([auth_fun/0, auth_status/0, config/0]).
 
@@ -68,6 +68,14 @@ handle_event(_Event, _Args, _Config) ->
     ok.
 
 
+%% @doc Default to `forbidden', in case of missing `auth_fun' config.
+-spec default_auth_fun(Req, User, Password) -> AuthStatus when
+      Req        :: elli:req(),
+      User       :: binary(),
+      Password   :: binary(),
+      AuthStatus :: auth_status().
+default_auth_fun(_Req, _User, _Password) ->
+    forbidden.
 
 
 %%
@@ -80,11 +88,7 @@ handle_event(_Event, _Args, _Config) ->
 
 
 auth_fun(Config) ->
-    proplists:get_value(auth_fun, Config,
-        %% default to forbidden in case of missing auth_fun config
-        fun (_Req, _User, _Password) ->
-            forbidden
-        end).
+    proplists:get_value(auth_fun, Config, fun default_auth_fun/3).
 
 
 auth_realm(Config) ->
