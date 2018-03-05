@@ -41,6 +41,9 @@
                    term()].
 
 
+-define(DEFAULT_CREDENTIALS, {undefined, undefined}).
+
+
 %% @doc Protect `Req' based on the configured `auth_fun'.
 %% If none is given, the default authentication is `forbidden'.
 -spec handle(elli:req(), config()) -> elli_handler:result().
@@ -97,35 +100,25 @@ auth_realm(Config) ->
 
 
 credentials(Req) ->
-    case authorization_header(Req) of
-        undefined ->
-            {undefined, undefined};
-
-        AuthorizationHeader ->
-            credentials_from_header(AuthorizationHeader)
-    end.
+    credentials_from_header(authorization_header(Req)).
 
 
 authorization_header(Req) ->
     elli_request:get_header(<<"Authorization">>, Req).
 
 
-credentials_from_header(AuthorizationHeader) ->
-    case binary:split(AuthorizationHeader, <<$ >>) of
-        [<<"Basic">>, EncodedCredentials] ->
-            decoded_credentials(EncodedCredentials);
-
-        _ ->
-            {undefined, undefined}
-    end.
+credentials_from_header(<<"Basic ", EncodedCredentials/binary>>) ->
+    decoded_credentials(EncodedCredentials);
+credentials_from_header(_Authorization) ->
+    ?DEFAULT_CREDENTIALS.
 
 
 decoded_credentials(EncodedCredentials) ->
     DecodedCredentials = base64:decode(EncodedCredentials),
-    case binary:split(DecodedCredentials, <<$:>>) of
-        [User, Password] ->
-            {User, Password};
+    do_decoded_credentials(binary:split(DecodedCredentials, <<$:>>)).
 
-        _ ->
-            {undefined, undefined}
-    end.
+
+do_decoded_credentials([User, Password]) ->
+    {User, Password};
+do_decoded_credentials(_Bins) ->
+    ?DEFAULT_CREDENTIALS.
