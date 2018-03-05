@@ -1,9 +1,10 @@
 %% @doc Elli basicauth middleware
+%% @author Martin Rehfeld
+%% @author Eric Bailey
+%% @copyright 2013, Martin Rehfeld; 2018, elli-lib team
 %%
 %% This middleware provides basic authentication to protect
-%% Reqs based on a user-configured authentication function
-%% @author Martin Rehfeld
-
+%% requests, based on a user-configured authentication function.
 -module(elli_basicauth).
 
 -behaviour(elli_handler).
@@ -40,6 +41,9 @@
                    term()].
 
 
+%% @doc Protect `Req' based on the configured `auth_fun'.
+%% If none is given, the default authentication is `forbidden'.
+-spec handle(elli:req(), config()) -> elli_handler:result().
 handle(Req, Config) ->
     {User, Password} = credentials(Req),
 
@@ -58,10 +62,12 @@ handle(Req, Config) ->
         _ ->
             ignore
     end.
-
-
-handle_event(_, _, _) ->
+%% @doc No-op to satisfy the `elli_handler' behaviour. Return `ok'.
+-spec handle_event(elli_handler:event(), list(), config()) -> ok.
+handle_event(_Event, _Args, _Config) ->
     ok.
+
+
 
 
 %%
