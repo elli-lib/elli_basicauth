@@ -1,11 +1,14 @@
-{application, elli_basicauth,
- [
-  {description, ""},
-  {vsn, "1"},
-  {registered, []},
-  {applications, [
-                  kernel,
-                  stdlib
-                 ]},
-  {env, []}
- ]}.
+{application, elli_basicauth, [
+  {description,  "Basic authentication middleware for elli."},
+  {vsn,          "0.1.0"},
+  {modules,      []},
+  {registered,   []},
+  {applications, [kernel, stdlib]},
+  {env,          []},
+
+  {maintainers,  ["elli-lib team"]},
+  {licenses,     ["MIT"]},
+  {links, [
+    {"GitHub", "https://github.com/elli-lib/elli_basicauth"}
+  ]}
+]}.
