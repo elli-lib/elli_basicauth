@@ -46,22 +46,22 @@
 -spec handle(elli:req(), config()) -> elli_handler:result().
 handle(Req, Config) ->
     {User, Password} = credentials(Req),
+    Authentication = apply(auth_fun(Config), [Req, User, Password]),
+    do_handle(Authentication, Config).
 
-    case apply(auth_fun(Config), [Req, User, Password]) of
-        unauthorized ->
-            throw({401,
-                   [{<<"WWW-Authenticate">>, auth_realm(Config)}],
-                   <<"Unauthorized">>});
 
-        forbidden ->
-            throw({403, [], <<"Forbidden">>});
+-spec do_handle(auth_status(), config()) -> elli_handler:result().
+do_handle(ok, _Config) ->
+    ignore;
+do_handle(unauthorized, Config) ->
+    Headers = [{<<"WWW-Authenticate">>, auth_realm(Config)}],
+    {401, Headers, <<"Unauthorized">>};
+do_handle(forbidden, _Config) ->
+    {403, [], <<"Forbidden">>};
+do_handle(hidden, _Config) ->
+    {404, [], <<>>}.
 
-        hidden ->
-            throw({404, [], <<>>});
 
-        _ ->
-            ignore
-    end.
 %% @doc No-op to satisfy the `elli_handler' behaviour. Return `ok'.
 -spec handle_event(elli_handler:event(), list(), config()) -> ok.
 handle_event(_Event, _Args, _Config) ->
