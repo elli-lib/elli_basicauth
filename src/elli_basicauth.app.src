@@ -7,7 +7,7 @@
   {env,          []},
 
   {maintainers,  ["elli-lib team"]},
-  %% {licenses,     ["FIXME"]},
+  {licenses,     ["MIT"]},
   {links, [
     {"GitHub", "https://github.com/elli-lib/elli_basicauth"}
   ]}
