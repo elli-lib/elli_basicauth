@@ -9,16 +9,20 @@
 
 -behaviour(elli_handler).
 
--export([handle/2, handle_event/3, default_auth_fun/3]).
+-export([handle/2, handle_event/3, default_auth_fun/2]).
 
--export_type([auth_fun/0, auth_status/0, config/0]).
+-export_type([auth_fun/0, auth_status/0, config/0, credentials/0]).
 
 
 %% @type auth_fun(). A user-configurable authentication function.
--type auth_fun() :: fun((Req      :: elli:req(),
-                         Username :: binary(),
-                         Password :: binary()) ->
+-type auth_fun() :: fun((Req         :: elli:req(),
+                         Credentials :: credentials()) ->
                                AuthStatus :: auth_status()).
+
+
+-type credentials() :: {undefined, undefined} |
+                       {Username :: binary(),
+                        Password :: binary()}.
 
 
 %% @type auth_status(). The result of an {@type auth_fun()}.
@@ -44,12 +48,15 @@
 -define(DEFAULT_CREDENTIALS, {undefined, undefined}).
 
 
+-define(DEFAULT_REALM, <<"Secure Area">>).
+
+
 %% @doc Protect `Req' based on the configured `auth_fun'.
 %% If none is given, the default authentication is `forbidden'.
 -spec handle(elli:req(), config()) -> elli_handler:result().
 handle(Req, Config) ->
-    {User, Password} = credentials(Req),
-    Authentication = apply(auth_fun(Config), [Req, User, Password]),
+    Credentials = credentials(Req),
+    Authentication = apply(auth_fun(Config), [Req, Credentials]),
     do_handle(Authentication, Config).
 
 
@@ -72,12 +79,11 @@ handle_event(_Event, _Args, _Config) ->
 
 
 %% @doc Default to `forbidden', in case of missing `auth_fun' config.
--spec default_auth_fun(Req, User, Password) -> AuthStatus when
-      Req        :: elli:req(),
-      User       :: binary(),
-      Password   :: binary(),
-      AuthStatus :: auth_status().
-default_auth_fun(_Req, _User, _Password) ->
+-spec default_auth_fun(Req, Credentials) -> AuthStatus when
+      Req         :: elli:req(),
+      Credentials :: credentials(),
+      AuthStatus  :: auth_status().
+default_auth_fun(_Req, {_User, _Password}) ->
     forbidden.
 
 
@@ -85,19 +91,14 @@ default_auth_fun(_Req, _User, _Password) ->
 %% INTERNAL HELPERS
 %%
 
--type credentials() :: {undefined, undefined} |
-                       {Username :: binary(),
-                        Password :: binary()}.
-
-
 -spec auth_fun(config()) -> auth_fun().
 auth_fun(Config) ->
-    proplists:get_value(auth_fun, Config, fun default_auth_fun/3).
+    proplists:get_value(auth_fun, Config, fun default_auth_fun/2).
 
 
 -spec auth_realm(config()) -> binary().
 auth_realm(Config) ->
-    Realm = proplists:get_value(auth_realm, Config, <<"Secure Area">>),
+    Realm = proplists:get_value(auth_realm, Config, ?DEFAULT_REALM),
     iolist_to_binary([<<"Basic realm=\"">>, Realm, <<"\"">>]).
 
 

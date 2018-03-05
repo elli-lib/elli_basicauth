@@ -76,26 +76,25 @@ elli_handler_behaviour_test() ->
 %%
 
 basicauth_config() ->
-    [{auth_fun, fun auth_fun/3}].
+    [{auth_fun, fun auth_fun/2}].
 
 
 hidden_basicauth_config() ->
-    [{auth_fun, fun hidden_auth_fun/3}].
+    [{auth_fun, fun hidden_auth_fun/2}].
 
 
 basicauth_config_with_custom_realm() ->
-    [{auth_fun, fun auth_fun/3},
-     {auth_realm, <<"Members only">>}].
+    [{auth_realm, <<"Members only">>} | basicauth_config()].
+     
 
 
-auth_fun(_Req, undefined, undefined) -> unauthorized;
-auth_fun(_Req, ?USER, ?PASSWORD) -> ok;
-auth_fun(_Req, _User, _Password) -> forbidden.
+auth_fun(_Req, {undefined, undefined}) -> unauthorized;
+auth_fun(_Req, {?USER, ?PASSWORD})     -> ok;
+auth_fun(_Req, _Credentials)           -> forbidden.
 
 
-hidden_auth_fun(_Req, undefined, undefined) -> hidden;
-hidden_auth_fun(_Req, ?USER, ?PASSWORD) -> ok;
-hidden_auth_fun(_Req, _User, _Password) -> hidden.
+hidden_auth_fun(_Req, {?USER, ?PASSWORD}) -> ok;
+hidden_auth_fun(_Req, _Credentials)       -> hidden.
 
 
 no_auth(Expected) ->
