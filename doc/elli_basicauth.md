@@ -76,12 +76,24 @@ The configurable options are:
 ## Function Index ##
 
 
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#handle-2">handle/2</a></td><td>Protect <code>Req</code> based on the configured <code>auth_fun</code>.</td></tr><tr><td valign="top"><a href="#handle_event-3">handle_event/3</a></td><td>No-op to satisfy the <code>elli_handler</code> behaviour.</td></tr></table>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#default_auth_fun-3">default_auth_fun/3</a></td><td>Default to <code>forbidden</code>, in case of missing <code>auth_fun</code> config.</td></tr><tr><td valign="top"><a href="#handle-2">handle/2</a></td><td>Protect <code>Req</code> based on the configured <code>auth_fun</code>.</td></tr><tr><td valign="top"><a href="#handle_event-3">handle_event/3</a></td><td>No-op to satisfy the <code>elli_handler</code> behaviour.</td></tr></table>
 
 
 <a name="functions"></a>
 
 ## Function Details ##
+
+<a name="default_auth_fun-3"></a>
+
+### default_auth_fun/3 ###
+
+<pre><code>
+default_auth_fun(Req, User, Password) -&gt; AuthStatus
+</code></pre>
+
+<ul class="definitions"><li><code>Req = <a href="http://raw.github.com/elli-lib/elli/develop/doc/elli.md#type-req">elli:req()</a></code></li><li><code>User = binary()</code></li><li><code>Password = binary()</code></li><li><code>AuthStatus = <a href="#type-auth_status">auth_status()</a></code></li></ul>
+
+Default to `forbidden`, in case of missing `auth_fun` config.
 
 <a name="handle-2"></a>
 
